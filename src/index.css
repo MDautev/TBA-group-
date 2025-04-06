@@ -1,0 +1,105 @@
+/* Основни стилове */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Стилове за NavBar */
+nav {
+  background-color: #2563eb; /* Blue color */
+  color: white;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+nav .text-xl {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+nav a {
+  margin-left: 16px;
+  text-decoration: none;
+  color: white;
+  font-size: 1rem;
+}
+
+nav a:hover {
+  color: #fbbf24; /* Yellow color */
+}
+
+nav button {
+  margin-left: 16px;
+  padding: 10px 20px;
+  background-color: #ef4444; /* Red color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+nav button:hover {
+  background-color: #dc2626; /* Darker red */
+}
+
+/* Стилове за Login и Register компонента */
+.login-container,
+.register-container {
+  max-width: 400px;
+  margin: 100px auto;
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-title,
+.register-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+/* Стилове за полетата за въвеждане */
+.input-field {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.input-field:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
+
+/* Бутоните за Login и Register */
+.login-btn,
+.register-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.login-btn:hover,
+.register-btn:hover {
+  background-color: #45a049;
+}
