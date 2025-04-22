@@ -1,13 +1,17 @@
-from django.contrib import admin
+"""
+Конфигурация на Django Admin за приложението.
 
-# Register your models here.
+Този модул регистрира всички модели към Django Admin интерфейса,
+позволявайки управление през административния панел.
+"""
+
 from django.contrib import admin
 from .models import (
     User, Client, Employee, DeliveryPerson,
     Category, Restaurant, Product, Order, OrderItem, Delivery
 )
 
-# Регистрирайте всички модели
+# Регистрация на всички модели в admin панела
 admin.site.register(User)
 admin.site.register(Client)
 admin.site.register(Employee)
