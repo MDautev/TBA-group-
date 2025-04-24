@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'the_delivery_web',  # Името на базата данни
         'USER': 'postgres',           # Потребителско име за PostgreSQL
-        'PASSWORD': 'databasepass',  # Паролата за PostgreSQL
+        'PASSWORD': 'root123',  # Паролата за PostgreSQL
         'HOST': 'localhost',          # Хост, обикновено е localhost
         'PORT': '5432',               # Порт, по подразбиране е 5432
     }
