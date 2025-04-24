@@ -82,5 +82,5 @@ class CheckoutForm(forms.Form):
 
 
 
-        fields = ['restaurant', 'name', 'description', 'price']
+    fields = ['restaurant', 'name', 'description', 'price']
 
