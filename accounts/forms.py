@@ -66,6 +66,46 @@ class ProductForm(forms.ModelForm):
 
 
 class OrderForm(forms.ModelForm):
+    """
+    Форма за създаване и редактиране на поръчки с включени продукти.
+
+    Предоставя интерфейс с checkbox-и за избор на множество продукти,
+    които да бъдат включени в поръчката. Обслужва many-to-many връзката
+    между Order и Product.
+
+    Полета:
+        items (ModelMultipleChoiceField):
+            - Позволява избор на множество продукти
+            - Визуализира се като checkbox-и (CheckboxSelectMultiple)
+            - Задължително поле (трябва да изберете поне един продукт)
+            - Съдържа всички налични продукти от базата данни
+
+    Meta:
+        model (Order): Моделът Order, на който се базира формата
+        fields (list): Съдържа само полето 'items', което е единственото
+                      необходимо за създаване на поръчка
+
+    Примерна употреба:
+        form = OrderForm()
+        # или със съществуваща поръчка
+        form = OrderForm(instance=поръчка)
+        
+        if request.method == 'POST':
+            form = OrderForm(request.POST, instance=поръчка)
+            if form.is_valid():
+                поръчка = form.save()
+                # Допълнителна обработка...
+
+    Валидация:
+        - Автоматично проверява дали избраните продукти съществуват
+        - Изисква избор на поне един продукт
+
+    Рендиране в шаблони:
+        Показва checkbox-и за избор на продукти. В шаблона използвайте:
+        {% for checkbox in form.items %}
+            {{ checkbox.tag }} {{ checkbox.choice_label }}
+        {% endfor %}
+    """
     items = forms.ModelMultipleChoiceField(
         queryset=Product.objects.all(),
         widget=forms.CheckboxSelectMultiple,
@@ -77,10 +117,41 @@ class OrderForm(forms.ModelForm):
         fields = ['items']
 
 class CheckoutForm(forms.Form):
+    """
+    Форма за финализиране на поръчка и въвеждане на данни за доставка.
+
+    Полета:
+        address (CharField):
+            - Адрес за доставка
+            - Максимална дължина: 255 символа
+            - Задължително поле
+            - Етикет: "Адрес"
+
+        phone_number (CharField):
+            - Телефонен номер за връзка
+            - Максимална дължина: 20 символа
+            - Задължително поле
+            - Етикет: "Телефонен номер"
+
+    Валидация:
+        - Проверява дали е въведен адрес
+        - Проверява формата на телефонния номер
+        - Автоматично премахва празните пространства от полетата
+
+    Примерна употреба:
+        form = CheckoutForm(request.POST or None)
+        if form.is_valid():
+            адрес = form.cleaned_data['address']
+            телефон = form.cleaned_data['phone_number']
+            # Създаване на поръчка...
+
+    Забележки:
+        - Това е стандартна Django форма (не ModelForm)
+        - Не включва логика за плащане
+        - Полетата ['restaurant', 'name', 'description', 'price'] са документирани,
+          но не са част от текущата версия на формата
+    """
     address = forms.CharField(max_length=255, required=True, label="Адрес")
     phone_number = forms.CharField(max_length=20, required=True, label="Телефонен номер")
 
-
-
-    fields = ['restaurant', 'name', 'description', 'price']
 
