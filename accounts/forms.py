@@ -20,6 +20,7 @@ from .models import User, Restaurant, Product
 
 
 
+'''
 class CustomUserCreationForm(UserCreationForm):
     """
     Разширена форма за регистрация на потребител с избор на роля.
@@ -39,6 +40,26 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'password1', 'password2', 'role')
+        fields = ('username', 'password1', 'password2', 'role')  # Добавяме полето "role"
+
+'''
+class CustomUserCreationForm(UserCreationForm):
+    role = forms.ChoiceField(
+        choices=[
+            ('client', 'Клиент'),
+            ('employee', 'Служител'),
+            ('delivery_person', 'Доставчик'),
+        ],
+        widget=forms.RadioSelect,
+        required=True,
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'password1', 'password2', 'role')
+
+
+
 
 
 class RestaurantForm(forms.ModelForm):
@@ -154,4 +175,12 @@ class CheckoutForm(forms.Form):
     address = forms.CharField(max_length=255, required=True, label="Адрес")
     phone_number = forms.CharField(max_length=20, required=True, label="Телефонен номер")
 
-
+class DateRangeForm(forms.Form):
+    start_date = forms.DateField(
+        label="От дата",
+        widget=forms.DateInput(attrs={'type': 'date'})
+    )
+    end_date = forms.DateField(
+        label="До дата",
+        widget=forms.DateInput(attrs={'type': 'date'})
+    )
