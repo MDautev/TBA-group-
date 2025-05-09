@@ -176,6 +176,13 @@ class CheckoutForm(forms.Form):
     phone_number = forms.CharField(max_length=20, required=True, label="Телефонен номер")
 
 class DateRangeForm(forms.Form):
+    """
+    Форма за избор на период от дати.
+
+    Полета:
+        start_date (DateField): Начална дата на периода. Визуализира се като HTML елемент от тип 'date'.
+        end_date (DateField): Крайна дата на периода. Визуализира се като HTML елемент от тип 'date'.
+    """
     start_date = forms.DateField(
         label="От дата",
         widget=forms.DateInput(attrs={'type': 'date'})

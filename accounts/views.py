@@ -264,11 +264,31 @@ def delivery_person_dashboard(request):
     return render(request, 'accounts/delivery_person_dashboard.html')
 
 def delivery_dashboard(request):
+    """
+    Показва табло за доставчици с активни поръчки.
+
+    Args:
+        request: HttpRequest обект.
+
+    Returns:
+        HttpResponse: Рендерира шаблона 'accounts/delivery_dashboard.html' с активните поръчки.
+    """
     active_orders = Order.objects.filter(delivery_person=request.user.deliveryperson, status='shipped')
     return render(request, 'accounts/delivery_dashboard.html', {'orders': active_orders})
 
 @login_required
 def edit_restaurant(request, pk):
+    """
+    Позволява редактиране на ресторант (само за служители).
+
+    Args:
+        request: HttpRequest обект.
+        pk: Primary key на ресторанта за редактиране.
+
+    Returns:
+        HttpResponse: Пренасочва към 'home' при неоторизиран достъп.
+        HttpResponse: Рендерира форма за редактиране или пренасочва след успешно редактиране.
+    """
     if not request.user.is_employee:
         return redirect('home')  # Само служители могат да редактират ресторанти
     restaurant = get_object_or_404(Restaurant, pk=pk)
@@ -283,6 +303,17 @@ def edit_restaurant(request, pk):
 
 @login_required
 def delete_restaurant(request, pk):
+    """
+    Позволява изтриване на ресторант (само за служители).
+
+    Args:
+        request: HttpRequest обект.
+        pk: Primary key на ресторанта за изтриване.
+
+    Returns:
+        HttpResponse: Пренасочва към 'home' при неоторизиран достъп.
+        HttpResponse: Потвърждаваща страница за изтриване или пренасочва след изтриване.
+    """
     if not request.user.is_employee:
         return redirect('home')  # Само служители могат да изтриват ресторанти
     restaurant = get_object_or_404(Restaurant, pk=pk)
@@ -293,6 +324,17 @@ def delete_restaurant(request, pk):
 
 @login_required
 def edit_product(request, pk):
+    """
+    Позволява редактиране на продукт (само за служители).
+
+    Args:
+        request: HttpRequest обект.
+        pk: Primary key на продукта за редактиране.
+
+    Returns:
+        HttpResponse: Пренасочва към 'home' при неоторизиран достъп.
+        HttpResponse: Рендерира форма за редактиране или пренасочва след успешно редактиране.
+    """
     if not request.user.is_employee:
         return redirect('home')  # Само служители могат да редактират продукти
     product = get_object_or_404(Product, pk=pk)
@@ -307,6 +349,17 @@ def edit_product(request, pk):
 
 @login_required
 def delete_product(request, pk):
+    """
+    Позволява изтриване на продукт (само за служители).
+
+    Args:
+        request: HttpRequest обект.
+        pk: Primary key на продукта за изтриване.
+
+    Returns:
+        HttpResponse: Пренасочва към 'home' при неоторизиран достъп.
+        HttpResponse: Потвърждаваща страница за изтриване или пренасочва след изтриване.
+    """
     if not request.user.is_employee:
         return redirect('home')  # Само служители могат да изтриват продукти
     product = get_object_or_404(Product, pk=pk)
@@ -317,6 +370,16 @@ def delete_product(request, pk):
 
 @login_required
 def view_products(request):
+    """
+    Показва списък с продукти за клиентите, с възможност за филтриране по категория.
+
+    Args:
+        request: HttpRequest обект.
+
+    Returns:
+        HttpResponse: Пренасочва към 'home' при неоторизиран достъп.
+        HttpResponse: Рендерира списък с продукти и категории.
+    """
     if not request.user.is_client:
         return redirect('home')  # Само клиенти могат да правят поръчки
 
@@ -345,20 +408,18 @@ def view_products(request):
 
     return render(request, 'accounts/view_products.html', {'products': products, 'categories': categories})
 
-
 @login_required
-def delivery_dashboard(request):
-    if not request.user.is_delivery_person:
-        return redirect('home')  # Само доставчици могат да виждат този дашбоард
-
-    # Филтриране на поръчки според статуса
-    orders = Order.objects.filter(status__in=['pending', 'shipped']).order_by('-created_at')
-
-    return render(request, 'accounts/delivery_dashboard.html', {'orders': orders})
-
-
-#@login_required
 def accept_delivery(request, pk):
+    """
+    Позволява на доставчик да приеме поръчка за доставка.
+
+    Args:
+        request: HttpRequest обект.
+        pk: Primary key на поръчката.
+
+    Returns:
+        HttpResponse: Пренасочва към дашборда за доставчици със съобщение за статуса.
+    """
     order = get_object_or_404(Order, pk=pk)
 
     # Проверка дали поръчката е вече взета от доставчик
@@ -379,9 +440,18 @@ def accept_delivery(request, pk):
     messages.success(request, "Успешно сте взели поръчка.")
     return redirect('delivery_dashboard')
 
-
 @login_required
 def create_order(request):
+    """
+    Създава нова поръчка от клиент.
+
+    Args:
+        request: HttpRequest обект.
+
+    Returns:
+        HttpResponse: Пренасочва към 'home' при неоторизиран достъп.
+        HttpResponse: Рендерира форма за създаване на поръчка или пренасочва към плащане.
+    """
     if not request.user.is_client:
         return redirect('home')  # Само клиенти могат да правят поръчки
 
@@ -428,6 +498,16 @@ def create_order(request):
 
 @login_required
 def mark_as_delivered(request, pk):
+    """
+    Маркира поръчка като доставена (за доставчици).
+
+    Args:
+        request: HttpRequest обект.
+        pk: Primary key на поръчката.
+
+    Returns:
+        HttpResponse: Пренасочва към дашборда за доставчици със съобщение за статуса.
+    """
     order = get_object_or_404(Order, pk=pk)
 
     # Проверка дали поръчката вече е доставена
@@ -444,6 +524,16 @@ def mark_as_delivered(request, pk):
 
 @login_required
 def add_to_cart(request, pk):
+    """
+    Добавя продукт в количката на клиента.
+
+    Args:
+        request: HttpRequest обект.
+        pk: Primary key на продукта.
+
+    Returns:
+        HttpResponse: Пренасочва към списъка с продукти.
+    """
     if not request.user.is_client:
         return redirect('home')  # Само клиенти могат да добавят продукти в количката
     product = get_object_or_404(Product, pk=pk)
@@ -452,8 +542,19 @@ def add_to_cart(request, pk):
         cart_item.quantity += 1
         cart_item.save()
     return redirect('view_products')
+
 @login_required
 def view_cart(request):
+    """
+    Показва съдържанието на количката на клиента.
+
+    Args:
+        request: HttpRequest обект.
+
+    Returns:
+        HttpResponse: Пренасочва към 'home' при неоторизиран достъп.
+        HttpResponse: Рендерира количката с продукти и обща сума.
+    """
     if not request.user.is_client:
         return redirect('home')  # Само клиенти могат да правят поръчки
     cart_items = CartItem.objects.filter(user=request.user)
@@ -462,15 +563,34 @@ def view_cart(request):
 
 @login_required
 def remove_from_cart(request, pk):
+    """
+    Премахва продукт от количката на клиента.
+
+    Args:
+        request: HttpRequest обект.
+        pk: Primary key на продукта в количката.
+
+    Returns:
+        HttpResponse: Пренасочва към количката.
+    """
     if not request.user.is_client:
         return redirect('home')  # Само клиенти могат да премахват продукти от количката
     cart_item = get_object_or_404(CartItem, pk=pk, user=request.user)
     cart_item.delete()
     return redirect('view_cart')
 
-
 @login_required
 def checkout(request):
+    """
+    Обработва плащането на поръчката от количката.
+
+    Args:
+        request: HttpRequest обект.
+
+    Returns:
+        HttpResponse: Пренасочва към 'home' при неоторизиран достъп.
+        HttpResponse: Рендерира форма за плащане или пренасочва след успешно плащане.
+    """
     if not request.user.is_client:
         return redirect('home')  # Само клиенти могат да правят поръчки
 
@@ -506,6 +626,16 @@ def checkout(request):
 
 @login_required
 def track_orders(request):
+    """
+    Показва история на поръчките на клиента.
+
+    Args:
+        request: HttpRequest обект.
+
+    Returns:
+        HttpResponse: Пренасочва към 'home' при неоторизиран достъп.
+        HttpResponse: Рендерира списък с поръчките на клиента.
+    """
     if not request.user.is_client:
         return redirect('home')  # Само клиенти могат да проследяват поръчки
     client = Client.objects.get(user=request.user)
@@ -513,6 +643,15 @@ def track_orders(request):
     return render(request, 'accounts/track_orders.html', {'orders': orders})
 
 def turnover_report(request):
+    """
+    Генерира отчет за оборота за определен период (за администратори).
+
+    Args:
+        request: HttpRequest обект.
+
+    Returns:
+        HttpResponse: Рендерира отчет с оборота за избрания период.
+    """
     # Вземане на начална и крайна дата от GET параметрите
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -552,12 +691,32 @@ def turnover_report(request):
 
 @login_required
 def admin_dashboard(request):
+    """
+    Показва административен панел (само за администратори).
+
+    Args:
+        request: HttpRequest обект.
+
+    Returns:
+        HttpResponse: Пренасочва към 'home' при неоторизиран достъп.
+        HttpResponse: Рендерира административния панел.
+    """
     if not request.user.is_staff:
         return redirect('home')  # Само администратори могат да виждат тази страница
 
     return render(request, 'accounts/admin_dashboard.html')
 
 def generate_turnover_report(request):
+    """
+    Генерира отчет за оборота за избран период (за администратори).
+
+    Args:
+        request: HttpRequest обект.
+
+    Returns:
+        HttpResponse: Рендерира форма за избор на период или отчет.
+        HttpResponse: Показва грешка при невалидни дати.
+    """
     # Вземаме начална и крайна дата от GET параметрите
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -593,8 +752,17 @@ def generate_turnover_report(request):
     # Ако няма дати, показваме формата за избор на период
     return render(request, 'admin/turnover_report_form.html')
 
-
 def earnings_report(request, delivery_person_id):
+    """
+    Генерира отчет за приходите на доставчик.
+
+    Args:
+        request: HttpRequest обект.
+        delivery_person_id: ID на доставчика.
+
+    Returns:
+        HttpResponse: Рендерира отчет с приходите на доставчика.
+    """
     delivery_person = get_object_or_404(DeliveryPerson, pk=delivery_person_id)
     orders = Order.objects.filter(delivery_person=delivery_person, status='delivered')
 

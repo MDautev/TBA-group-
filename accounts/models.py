@@ -146,15 +146,21 @@ class Product(models.Model):
 
 class Order(models.Model):
     """
-    Поръчка, направена от клиент, съдържаща продукти.
+    Полета:
+        client (ForeignKey): Свързана клиентска поръчка.
+        products (ManyToManyField): Продукти, свързани с поръчката чрез `OrderItem`.
+        total_price (DecimalField): Обща стойност на поръчката.
+        status (CharField): Статус на поръчката (например, 'В процес', 'Изпратена').
+        created_at (DateTimeField): Дата и час на създаване на поръчката.
+        delivery_person (ForeignKey): Доставчик, който се свързва с поръчката.
+        address (CharField): Адрес за доставка.
+        phone_number (CharField): Телефонен номер на клиента.
 
-    Attributes:
-        client (Client): Клиентът, който е направил поръчката.
-        products (ManyToMany[Product]): Продуктите в поръчката.
-        total_price (Decimal): Обща цена на поръчката.
-        status (str): Статус на поръчката.
-        created_at (datetime): Дата и час на създаване.
+    Методи:
+        save: Записва поръчката в базата данни и при необходимост обработва бонусите за доставчика.
+        _check_and_apply_bonus: Приложение на бонуси към доставчика при изпълнение на условията.
     """
+    
     STATUS_CHOICES = [
         ('pending', 'В процес'),
         ('shipped', 'Изпратена'),
@@ -178,6 +184,16 @@ class Order(models.Model):
     phone_number = models.CharField(max_length=20, blank=True, null=True)  # Поле за телефонен номер
 
     def save(self, *args, **kwargs):
+        """
+        Записва поръчката и при промяна на статуса на 'delivered' проверява и прилага бонуси за доставчика.
+
+        Ако поръчката е нова или статусът е променен на 'delivered', методът проверява дали доставчикът 
+        има право на бонуси на база стойността на поръчката и общия му оборот.
+
+        Аргументи:
+            *args: Допълнителни аргументи за метода.
+            **kwargs: Допълнителни ключови аргументи за метода.
+        """
         is_new = self._state.adding
 
         # Ако поръчката вече съществува, взимаме стария статус
@@ -187,7 +203,7 @@ class Order(models.Model):
         else:
             old_status = None
 
-        # Първо записваме без да triger-ваме бонус логиката
+        # Първо записваме без да тригерираме бонус логиката
         super().save(*args, **kwargs)
 
         # Проверка за бонус (само при промяна на статус на 'delivered')
@@ -199,6 +215,15 @@ class Order(models.Model):
                     self._bonus_processed = True
 
     def _check_and_apply_bonus(self, delivery_person):
+        """
+        Проверява дали доставчикът има право на бонус и го прилага, ако е необходимо.
+
+        Прилага бонус, ако доставчикът е достигнал минималния оборот, 
+        зададен в настройките на бонусите.
+
+        Аргументи:
+            delivery_person (DeliveryPerson): Доставчикът, за когото ще се провери и приложи бонус.
+        """
         bonus_settings = BonusSettings.objects.filter(is_active=True).first()
 
         # Добавяме САМО стойността на поръчката (без бонуса)
@@ -212,7 +237,14 @@ class Order(models.Model):
         delivery_person.save(update_fields=['total_turnover', 'total_bonuses'])
 
     def __str__(self):
+        """
+        Връща текстово представяне на поръчката, включващо нейния ID и потребителското име на клиента.
+
+        Връща:
+            str: Текстово представяне на поръчката.
+        """
         return f"Поръчка #{self.id} от {self.client.user.username}"
+
 
 
 class OrderItem(models.Model):
@@ -302,6 +334,18 @@ class CartItem(models.Model):
 
 
 class BonusSettings(models.Model):
+    """
+    Модел, който съхранява настройките за бонуси на доставчици.
+
+    Полета:
+        min_turnover (DecimalField): Минималният оборот, който доставчикът трябва да постигне, за да получи бонус.
+        bonus_amount (DecimalField): Сумата на бонуса, която се дава на доставчика, ако минималният оборот е достигнат.
+        is_active (BooleanField): Флаг, който показва дали настройката е активна или не.
+
+    Методи:
+        __str__: Връща текстово представяне на бонус настройката.
+    """
+    
     min_turnover = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -322,4 +366,10 @@ class BonusSettings(models.Model):
         verbose_name_plural = "Бонус настройки"
 
     def __str__(self):
+        """
+        Връща текстово представяне на бонус настройката.
+
+        Връща:
+            str: Текстовото представяне, включващо сумата на бонуса и минималния оборот.
+        """
         return f"Бонус: {self.bonus_amount} лв. при оборот ≥ {self.min_turnover} лв."

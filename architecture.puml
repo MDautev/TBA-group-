@@ -1,0 +1,18 @@
+@startuml
+skinparam componentStyle rectangle
+
+package "Frontend" {
+  [Browser] --> [Django Templates]
+}
+
+package "Backend (Django)" {
+  [Django Templates] --> [Views]
+  [Views] --> [Models]
+  [Views] --> [Admin Panel]
+  [Models] --> [PostgreSQL]
+}
+
+database "PostgreSQL" {
+  [PostgreSQL]
+}
+@enduml
