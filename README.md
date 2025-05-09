@@ -128,5 +128,5 @@ DATABASES = {
 
 Проектът се разработва от студенти, обединени около идеята за дигитална трансформация в доставките на храна.
 
-🔗 Виж всички участници: [GitHub Contributors](https://github.com/MDautev/TBA-group/graphs/contributors)
+🔗 Виж всички участници: [GitHub Contributors](https://github.com/MDautev/TBA-group-/graphs/contributors)
 
